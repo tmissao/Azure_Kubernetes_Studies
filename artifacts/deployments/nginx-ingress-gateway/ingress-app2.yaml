@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app2
+  annotations:
+    kubernetes.io/ingress.class: nginx # <-- Nginx Ingress Controller automatically detects this annotation
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true" # <-- Allow to use Regex for Managing Routing 
+    nginx.ingress.kubernetes.io/rewrite-target: /$1 #<-- Rewrites the request with the first capture group
+spec:
+  rules:
+  - http:
+      paths:
+      # Matches:
+      # /app2
+      # /app2/
+      # /app2/something(*)
+      # Rewrites to : /app2/ or /app2
+      - path: /app2(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: app2 # <-- Redirects to service app1
+            port:
+              number: 80
