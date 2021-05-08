@@ -132,6 +132,7 @@ helm install \
 ```
 
 - `Creating Cluster Issuer`
+
 A Cluster Issue represents a certificate authority from which signed x509 certificates can be obtained, such as Let's Encrypt.
 
 The Cluster Issue resource is a single issuer that can be consumed by multiple namespaces.
