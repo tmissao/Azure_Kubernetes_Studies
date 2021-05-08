@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingress-gateway-configuration
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    tls:
+      httpsRedirect: true # <-- Redirects HTTP to HTTPS
+    hosts:
+    - istio.codefeeling.com.br
+  - port:
+      number: 443 # <-- Just allow traffic on port 443
+      name: https
+      protocol: HTTPS # <-- Just allow protocol HTTPS
+    tls: # <-- Configures SSL
+      mode: SIMPLE
+      credentialName: ingress-cert # <-- References the Created Certificated
+    hosts:
+    - istio.codefeeling.com.br   # <-- Add your Host name here

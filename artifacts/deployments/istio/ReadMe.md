@@ -1,5 +1,8 @@
 # Istio on AKS
 
+## Configuring Istio
+---
+
 - `Installing Istio`
 
 ```bash
@@ -106,3 +109,109 @@ curl -s http://52.226.45.34 -v
 kubectl -n istio-system port-forward  svc/kiali  20001:20001
 curl -s http://localhost:20001
 ```
+
+## Configuring SSL
+---
+
+- `Installing Cert Manager`
+```bash
+# Creates Namespace
+kubectl create namespace cert-manager
+
+# Add Cert Manager Helm Repository
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+# Installing Cert Manager
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.3.1 \
+  --set installCRDs=true
+```
+
+- `Creating Cluster Issuer`
+A Cluster Issue represents a certificate authority from which signed x509 certificates can be obtained, such as Let's Encrypt.
+
+The Cluster Issue resource is a single issuer that can be consumed by multiple namespaces.
+
+```yaml
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+  namespace: cert-manager
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: t.missao@gmail.com # <-- Add your email here
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+      - http01:
+          ingress:
+            class: istio
+```
+
+- `Creating Istio SSL Certificate`
+
+The certificate should be created in the same namespace as the `istio-ingressgateway`
+
+```yaml
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ingress-cert
+  namespace: istio-system
+spec:
+  secretName: ingress-cert
+  commonName: istio.codefeeling.com.br # <-- Add Your HostName here
+  dnsNames:
+  -  istio.codefeeling.com.br # <-- Add Your HostName here
+  issuerRef:
+    name: letsencrypt # <-- ClusterIssuer Name
+    kind: ClusterIssuer
+    group: cert-manager.io
+```
+
+- `Updating Istio Gateway to use SSL`
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingress-gateway-configuration
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    tls:
+      httpsRedirect: true # <-- Redirects HTTP to HTTPS
+    hosts:
+    - istio.codefeeling.com.br
+  - port:
+      number: 443 # <-- Just allow traffic on port 443
+      name: https
+      protocol: HTTPS # <-- Just allow protocol HTTPS
+    tls: # <-- Configures SSL
+      mode: SIMPLE
+      credentialName: ingress-cert # <-- Certificate Name
+    hosts:
+    - istio.codefeeling.com.br   # <-- Add your Host name here
+```
+
+>Now the Demo App can handle SSL connections ! 
+
+
+## References
+---
+
+- [`Istio Cert-Manager Integration`](https://istio.io/latest/docs/ops/integrations/certmanager/)
+
+- [`Cert Manager`](https://cert-manager.io/docs/usage/certificate/)
+
+- [`Istio with Https Traffic`](https://medium.com/intelligentmachines/istio-https-traffic-secure-your-service-mesh-using-ssl-certificate-ac20ec2b6cd6)
