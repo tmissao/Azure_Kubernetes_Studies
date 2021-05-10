@@ -117,4 +117,6 @@ curl -XGET -u <es-cluster-username>:<es-cluster-password> <es-cluster-endpoint>/
 
 - [`FluentBit`](https://docs.fluentbit.io/manual/)
 
+- [`FluentBit Kubernetes`](https://docs.fluentbit.io/manual/installation/kubernetes)
+
 - [`FluentBit to ElastiSearch`](https://docs.fluentbit.io/manual/pipeline/outputs/elasticsearch#fluent-bit-elastic-cloud)
