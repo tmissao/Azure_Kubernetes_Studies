@@ -1,0 +1,11 @@
+config:
+  outputs: |
+    [OUTPUT]
+        Name es
+        Match *
+        Host <es-cluster-endpoint>
+        Port <es-cluster-port>
+        Cloud_Auth <es-cluster-username:password>
+        Index kubernets-logs
+        TLS On
+        Retry_Limit False
