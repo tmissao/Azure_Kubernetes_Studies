@@ -18,7 +18,7 @@ echo "vm successfull started" > ./log.txt
 
 # Login with Identity
 az login -i
-az storage blob upload --account-name storagemissaoterraform -f ./log.txt -c container-1 -n log.txt --auth-mode login
+az storage blob upload --account-name ${storage_name} -f ./log.txt -c ${container_name} -n log.txt --auth-mode login
 
 
 

@@ -14,7 +14,12 @@ variable "vnet_subnets" {
   }
 }
 variable "vnet_kubernets-services_address_space" { default = "10.0.20.0/24"}
-variable "storage_allowed_ips" { default = ["179.153.195.58"] }
+variable "storage_name" { default = "storagemissaoterraform" }
+variable "container1_name" { default = "container-1" }
+variable "container2_name" { default = "container-2" }
+variable "queue1_name" { default = "queue-1" }
+variable "queue2_name" { default = "queue-2" }
+variable "allowed_ips" { default = ["179.153.195.58", "187.183.123.142"] }
 variable "tags" {
   default = {
     "Terraform" = true

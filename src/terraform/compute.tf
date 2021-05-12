@@ -4,24 +4,24 @@ resource "azurerm_network_security_group" "vm" {
   resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
-    name                       = "SSH"
+    name                       = "ssh"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "22"
+    source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"
+    source_address_prefixes      = var.allowed_ips
     destination_address_prefix = "*"
   }
 
   security_rule {
-    name                       = "HTTP"
+    name                       = "http"
     priority                   = 200
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "80"
+    source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
@@ -51,10 +51,10 @@ resource "azurerm_network_interface" "vm" {
   tags = var.tags
 }
 
-# resource "azurerm_network_interface_security_group_association" "vm" {
-#   network_interface_id      = azurerm_network_interface.vm.id
-#   network_security_group_id = azurerm_network_security_group.vm.id
-# }
+resource "azurerm_network_interface_security_group_association" "vm" {
+  network_interface_id      = azurerm_network_interface.vm.id
+  network_security_group_id = azurerm_network_security_group.vm.id
+}
 
 data "template_file" "init" {
   template = file("${path.module}/scripts/init.cfg")
@@ -62,6 +62,10 @@ data "template_file" "init" {
 
 data "template_file" "shell-script" {
   template = file("${path.module}/scripts/setup.sh")
+  vars = {
+    storage_name = var.storage_name
+    container_name = var.container1_name
+  }
 }
 
 data "template_cloudinit_config" "config" {
@@ -106,4 +110,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
     type = "SystemAssigned"
   }
   tags = var.tags
+}
+
+resource "azurerm_role_assignment" "example" {
+  scope                = azurerm_storage_account.storage.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
 }
