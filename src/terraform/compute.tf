@@ -112,8 +112,20 @@ resource "azurerm_linux_virtual_machine" "vm" {
   tags = var.tags
 }
 
-resource "azurerm_role_assignment" "example" {
-  scope                = azurerm_storage_account.storage.id
+resource "azurerm_role_assignment" "c1" {
+  scope                = azurerm_storage_container.container1.resource_manager_id
   role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
+}
+
+resource "azurerm_role_assignment" "c2" {
+  scope                = azurerm_storage_container.container2.resource_manager_id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
+}
+
+resource "azurerm_role_assignment" "q1" {
+  scope                = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${azurerm_resource_group.rg.name}/providers/Microsoft.Storage/storageAccounts/${azurerm_storage_account.storage.name}/queueServices/default/queues/queue-1"
+  role_definition_name = "Storage Queue Data Message Sender"
   principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
 }

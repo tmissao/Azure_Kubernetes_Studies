@@ -21,4 +21,8 @@ az login -i
 az storage blob upload --account-name ${storage_name} -f ./log.txt -c ${container_name} -n log.txt --auth-mode login
 
 
-
+apt install npm -y
+apt update
+apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+apt -y install nodejs
