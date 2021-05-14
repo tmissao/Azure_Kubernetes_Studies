@@ -5,7 +5,7 @@ echo "##########################################################################
 echo "#                       Stating Installing Docker                                       #"
 echo "#########################################################################################"
 curl https://releases.rancher.com/install-docker/19.03.sh | sh
-usermod -a -G docker ubuntu
+usermod -a -G docker adminuser
 
 docker run -d -p 80:80 --name web nginx
 
@@ -20,9 +20,11 @@ echo "vm successfull started" > ./log.txt
 az login -i
 az storage blob upload --account-name ${storage_name} -f ./log.txt -c ${container_name} -n log.txt --auth-mode login
 
+# Run Docker Images
+az acr login --name ${acr_repository}
 
-apt install npm -y
-apt update
-apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-apt -y install nodejs
+# Run Consumer
+docker container run -d ${acr_repository}.azurecr.io/studies/consumer
+
+# Run Sender
+docker container run -d ${acr_repository}.azurecr.io/studies/sender

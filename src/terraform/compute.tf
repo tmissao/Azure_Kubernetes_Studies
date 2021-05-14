@@ -65,6 +65,7 @@ data "template_file" "shell-script" {
   vars = {
     storage_name = var.storage_name
     container_name = var.container1_name
+    acr_repository = azurerm_container_registry.acr.name
   }
 }
 
@@ -110,6 +111,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
     type = "SystemAssigned"
   }
   tags = var.tags
+
+  depends_on = [
+    null_resource.build-acr-images
+  ]
 }
 
 resource "azurerm_role_assignment" "c1" {
@@ -126,6 +131,12 @@ resource "azurerm_role_assignment" "c2" {
 
 resource "azurerm_role_assignment" "q1" {
   scope                = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${azurerm_resource_group.rg.name}/providers/Microsoft.Storage/storageAccounts/${azurerm_storage_account.storage.name}/queueServices/default/queues/queue-1"
-  role_definition_name = "Storage Queue Data Message Sender"
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
+}
+
+resource "azurerm_role_assignment" "acr" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
   principal_id         = azurerm_linux_virtual_machine.vm.identity.0.principal_id
 }

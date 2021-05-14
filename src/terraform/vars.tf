@@ -20,6 +20,7 @@ variable "container2_name" { default = "container-2" }
 variable "queue1_name" { default = "queue-1" }
 variable "queue2_name" { default = "queue-2" }
 variable "allowed_ips" { default = ["179.153.195.58", "187.183.123.142"] }
+variable "container_registry_name" { default = "missaoregistry" }
 variable "tags" {
   default = {
     "Terraform" = true
