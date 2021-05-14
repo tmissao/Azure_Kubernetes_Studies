@@ -1,0 +1,37 @@
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentity
+metadata:
+  name: queuecontributoraksidentity # Identity Custom Name
+spec:
+  type: 0
+  # UserManaged Identity Resource ID created on Azure
+  resourceID: ${IDENTITY_RESOURCE_ID}
+  # UserManaged Identity Client ID created on Azure
+  clientID: ${IDENTITY_CLIENT_ID}
+---
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: queuecontributoraksidentity-binding # AzureIdentityBinding Custom Name
+spec:
+  azureIdentity: queuecontributoraksidentity # <-- AzureIdentity Name created K8's
+  selector: queuecontributoraksidentity # <-- AzureIdentity Name created K8's
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sender  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sender
+  template:
+    metadata:
+      labels:
+        app: sender
+        aadpodidbinding: queuecontributoraksidentity # <-- AzureIdentity Name created K8's
+    spec:
+      containers:
+      - name: sender
+        image: missaoregistry.azurecr.io/studies/sender

@@ -27,4 +27,4 @@ az acr login --name ${acr_repository}
 docker container run -d ${acr_repository}.azurecr.io/studies/consumer
 
 # Run Sender
-docker container run -d ${acr_repository}.azurecr.io/studies/sender
+#docker container run -d ${acr_repository}.azurecr.io/studies/sender
