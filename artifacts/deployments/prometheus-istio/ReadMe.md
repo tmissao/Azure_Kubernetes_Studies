@@ -164,7 +164,7 @@ curl -s http://52.226.45.34 -v
 ---
 
 ```bash
-kubectl -n monitoring port-forward  svc/prometheus-grafana 3000
+kubectl -n monitoring port-forward  svc/prometheus-grafana 3000:80
 ```
 
 ![Prometheus-Istio](../../videos/PrometheusIstioGrafana.gif)
