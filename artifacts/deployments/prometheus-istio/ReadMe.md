@@ -167,8 +167,10 @@ curl -s http://52.226.45.34 -v
 kubectl -n monitoring port-forward  svc/prometheus-grafana 3000
 ```
 
-## References
+![Prometheus-Istio](../../videos/PrometheusIstioGrafana.gif)
 
+## References
+---
 - [`Prometheus Stack`](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
 
 - [`Grafana`](https://github.com/grafana/helm-charts/tree/main/charts/grafana#grafana-helm-chart)
